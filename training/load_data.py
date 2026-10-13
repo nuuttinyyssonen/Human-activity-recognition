@@ -37,4 +37,5 @@ def build_dataframe(directory):
 
 if __name__ == "__main__":
     df = build_dataframe("../data")
+    print(df.head())
     print(df.shape)   # (N, 9)
