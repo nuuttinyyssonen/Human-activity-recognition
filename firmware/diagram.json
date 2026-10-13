@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "author": "Nuutti Nyyssönen",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": -96, "left": -52.76, "attrs": {} },
+    { "type": "wokwi-mpu6050", "id": "imu1", "top": 157.42, "left": -45.68, "attrs": {} }
+  ],
+  "connections": [
+    [ "esp:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+    [ "imu1:GND", "esp:GND.2", "black", [ "v0" ] ],
+    [ "esp:3V3", "imu1:VCC", "red", [ "h0" ] ],
+    [ "esp:21", "imu1:SDA", "green", [ "h0" ] ],
+    [ "esp:22", "imu1:SCL", "green", [ "h0" ] ]
+  ],
+  "dependencies": {}
+}
