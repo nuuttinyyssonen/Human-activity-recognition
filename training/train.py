@@ -1,28 +1,80 @@
-from windowing import create_windows
-from load_data import build_dataframe
-from sklearn.model_selection import GroupShuffleSplit
-from features import extract_features
 import numpy as np
 
-df = build_dataframe("../data")
-X, y, subjects = create_windows(df, 100, 50)
+from load_data import build_dataframe
+from windowing import create_windows
+from features import extract_features
 
-# Initialize the splitter (e.g., 80% train, 20% test)
-gss = GroupShuffleSplit(n_splits=1, train_size=0.8, random_state=42)
+from sklearn.model_selection import GroupShuffleSplit, GroupKFold, cross_validate
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import classification_report, confusion_matrix
 
-# Get the train and test indices based on the subjects array
-train_idx, test_idx = next(gss.split(X, y, groups=subjects))
+DEPTHS = [2, 3, 4, 6, 8, 12, None]
 
-# Create your final train and test sets
-X_train, y_train = X[train_idx], y[train_idx]
-X_test, y_test = X[test_idx], y[test_idx]
 
-# Extract features to get a 2D matrix
-F_train = extract_features(X_train)
-F_test = extract_features(X_test)
+def split_by_subject(X, y, subjects, train_size=0.8, seed=42):
+    gss = GroupShuffleSplit(n_splits=1, train_size=train_size, random_state=seed)
+    train_idx, test_idx = next(gss.split(X, y, groups=subjects))
+    return train_idx, test_idx
 
-print(f"Train set windows: {X_train.shape}, Test set windows: {X_test.shape}")
-print(f"Unique train subjects: {np.unique(subjects[train_idx])}")
-print(f"Unique test subjects: {np.unique(subjects[test_idx])}")
-print(np.unique(y_test, return_counts=True))
-print(F_train.shape, F_test.shape)
+
+def depth_sweep(F_train, y_train, train_subjects, depths=DEPTHS):
+    n_splits = min(5, len(np.unique(train_subjects)))
+    gkf = GroupKFold(n_splits=n_splits)
+
+    train_scores, val_scores = [], []
+    print(f"{'Depth':<8} | {'Train F1 (Macro)':<18} | {'Val F1 (Macro)':<18}")
+    print("-" * 50)
+
+    for depth in depths:
+        clf = DecisionTreeClassifier(max_depth=depth, random_state=42)
+        cv = cross_validate(
+            clf, F_train, y_train,
+            groups=train_subjects,
+            cv=gkf,
+            scoring="f1_macro",
+            return_train_score=True,
+        )
+        train_scores.append(np.mean(cv["train_score"]))
+        val_scores.append(np.mean(cv["test_score"]))
+        print(f"{str(depth):<8} | {train_scores[-1]:.4f}             | {val_scores[-1]:.4f}")
+
+    return train_scores, val_scores
+
+
+def final_evaluation(F_train, y_train, F_test, y_test, depth):
+    clf = DecisionTreeClassifier(max_depth=depth, random_state=42)
+    clf.fit(F_train, y_train)
+    y_pred = clf.predict(F_test)
+
+    print("\n--- Final Test Set Evaluation ---")
+    print("Classes:", clf.classes_)
+    print(confusion_matrix(y_test, y_pred, labels=clf.classes_))
+    print()
+    print(classification_report(y_test, y_pred))
+    return clf
+
+
+if __name__ == "__main__":
+    df = build_dataframe("../data")
+    X, y, subjects = create_windows(df, 100, 50)
+
+    train_idx, test_idx = split_by_subject(X, y, subjects)
+    X_train, y_train = X[train_idx], y[train_idx]
+    X_test, y_test = X[test_idx], y[test_idx]
+    train_subjects = subjects[train_idx]
+
+    F_train = extract_features(X_train)
+    F_test = extract_features(X_test)
+
+    print(F_train.shape, F_test.shape)
+    print("Train subjects:", np.unique(train_subjects))
+    print("Test subjects: ", np.unique(subjects[test_idx]))
+
+    train_scores, val_scores = depth_sweep(F_train, y_train, train_subjects)
+
+    # Selection rule: highest validation score. Consider changing this to the
+    # smallest depth within ~0.01 of the best, and justify the choice.
+    best_depth = DEPTHS[int(np.argmax(val_scores))]
+    print(f"\n-> Selected max_depth: {best_depth}")
+
+    final_evaluation(F_train, y_train, F_test, y_test, best_depth)
