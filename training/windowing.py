@@ -1,8 +1,6 @@
 from load_data import build_dataframe, CHANNELS
 import numpy as np
 
-df = build_dataframe("../data")
-
 def create_windows(df, window_size, step):
     X, y, subjects = [], [], []
     for key, group in df.groupby(["subject", "trial", "activity"]):
@@ -14,9 +12,11 @@ def create_windows(df, window_size, step):
             y.append(activity)
             subjects.append(subject)
     return np.array(X), np.array(y), np.array(subjects)
-        
 
-X, y, subjects = create_windows(df, 100, 50)
 
-print(X.shape, y.shape, subjects.shape)
-print(np.unique(y, return_counts=True))
+if __name__ == "__main__":      
+    df = build_dataframe("../data")
+    X, y, subjects = create_windows(df, 100, 50)
+
+    print(X.shape, y.shape, subjects.shape)
+    print(np.unique(y, return_counts=True))
