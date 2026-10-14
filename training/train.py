@@ -1,6 +1,7 @@
 from windowing import create_windows
 from load_data import build_dataframe
 from sklearn.model_selection import GroupShuffleSplit
+from features import extract_features
 import numpy as np
 
 df = build_dataframe("../data")
@@ -16,7 +17,12 @@ train_idx, test_idx = next(gss.split(X, y, groups=subjects))
 X_train, y_train = X[train_idx], y[train_idx]
 X_test, y_test = X[test_idx], y[test_idx]
 
+# Extract features to get a 2D matrix
+F_train = extract_features(X_train)
+F_test = extract_features(X_test)
+
 print(f"Train set windows: {X_train.shape}, Test set windows: {X_test.shape}")
 print(f"Unique train subjects: {np.unique(subjects[train_idx])}")
 print(f"Unique test subjects: {np.unique(subjects[test_idx])}")
 print(np.unique(y_test, return_counts=True))
+print(F_train.shape, F_test.shape)
