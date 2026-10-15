@@ -42,4 +42,6 @@ Validation F1 peaks at depth 8, then falls while training F1 keeps rising to 1.0
 - **Firmware:** Claude suggested reading the MPU6050 registers directly instead of using a library, and pointed me to the register map document, with a link to a copy of it. I used it to look up the addresses: 0x68, 0x75, and 0x6B.
 - **data formatting** (`features.py`): Claude suggested and helped me to write function turns each window (a 100×6 block of numbers) into one row of 32 numbers. Each window of 600 raw numbers is too big and too noisy for a classifier (or an ESP32) to use directly, so the function boils it down to 32 summary numbers that capture how strong, how variable, and how oriented the motion is.
 - **Training** (`train.py`): Claude suggested and helped to write depth sweep that compares different max depth values to get best possible accuracy.
+**Tree export and test cases:** With Claude's guidance I was able to write `export_model.py`. Claude wrote me `test_cases.py`, which generates the `test_cases.h` header, and the C++ `run_tests()` function that compares the firmware's predictions with Python's on 24 windows. The firmware matched Python on all 24.
+- **C++ features:** I wrote `extract_features` in C++ with Claude's guidance.
 - Other use cases for AI: some debugging and validation for correctness was also made with AI.

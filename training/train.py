@@ -3,6 +3,8 @@ import numpy as np
 from load_data import build_dataframe
 from windowing import create_windows
 from features import extract_features
+from export_model import export_tree_to_cpp
+from test_cases import write_test_cases 
 
 from sklearn.model_selection import GroupShuffleSplit, GroupKFold, cross_validate
 from sklearn.tree import DecisionTreeClassifier
@@ -77,4 +79,11 @@ if __name__ == "__main__":
     best_depth = DEPTHS[int(np.argmax(val_scores))]
     print(f"\n-> Selected max_depth: {best_depth}")
 
-    final_evaluation(F_train, y_train, F_test, y_test, best_depth)
+    clf = final_evaluation(F_train, y_train, F_test, y_test, best_depth)
+
+    write_test_cases(clf, X_test, y_test, F_test, "../firmware/test_cases.h")
+
+    # Export tree
+    # clf = final_evaluation(F_train, y_train, F_test, y_test, best_depth)
+    # with open("../firmware/tree.h", "w") as fh:
+    #    fh.write("#pragma once\n" + export_tree_to_cpp(clf))

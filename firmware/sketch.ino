@@ -1,7 +1,11 @@
 #include <Adafruit_MPU6050.h>
 #include <Adafruit_Sensor.h>
+#include "tree.h"
+#include "test_cases.h"
 
 Adafruit_MPU6050 mpu;
+
+const char* CLASS_NAMES[6] = {"dws", "jog", "sit", "std", "ups", "wlk"};
 
 // Timing constants
 const unsigned long INTERVAL_US = 20000; // 20 ms -> 50 Hz
@@ -90,8 +94,36 @@ void extract_features(float win[WINDOW_SIZE][N_CHANNELS], float features[NUM_FEA
   features[f_idx++] = mag_std;
 }
 
+void run_tests() {
+  static float work[WINDOW_SIZE][N_CHANNELS];
+  static float feats[NUM_FEATURES];
+  int match = 0, correct = 0;
+
+  for (int t = 0; t < N_TESTS; t++) {
+    memcpy(work, TEST_WINDOWS[t], sizeof(work));  // extract_features needs a non-const array
+    extract_features(work, feats);
+    int pred = classify(feats);
+
+    bool same = (pred == PY_PRED[t]);
+    if (same) match++;
+    if (pred == TRUE_LABEL[t]) correct++;
+
+    Serial.print(t);
+    Serial.print(": true=");   Serial.print(CLASS_NAMES[TRUE_LABEL[t]]);
+    Serial.print(" python=");  Serial.print(CLASS_NAMES[PY_PRED[t]]);
+    Serial.print(" esp32=");   Serial.print(CLASS_NAMES[pred]);
+    Serial.println(same ? "  OK" : "  MISMATCH");
+  }
+  Serial.print("Matches Python: "); Serial.print(match);
+  Serial.print("/"); Serial.println(N_TESTS);
+  Serial.print("Matches true label: "); Serial.print(correct);
+  Serial.print("/"); Serial.println(N_TESTS);
+}
+
 void setup() {
   Serial.begin(115200);
+
+  run_tests();
 
   if (!mpu.begin()) {
     Serial.println("MPU6050 not found");
