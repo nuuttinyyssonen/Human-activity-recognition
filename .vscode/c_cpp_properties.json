@@ -1,0 +1,37 @@
+{
+  "configurations": [
+    {
+      "name": "ESP32",
+      "includePath": [
+        "${workspaceFolder}/firmware/include",
+        "${workspaceFolder}/firmware/src",
+        "${workspaceFolder}/firmware/.pio/libdeps/esp32dev/Adafruit MPU6050",
+        "${workspaceFolder}/firmware/.pio/libdeps/esp32dev/Adafruit Unified Sensor",
+        "${workspaceFolder}/firmware/.pio/libdeps/esp32dev/Adafruit BusIO",
+        "/Users/nuuttinyyssonen/.platformio/packages/framework-arduinoespressif32/cores/esp32",
+        "/Users/nuuttinyyssonen/.platformio/packages/framework-arduinoespressif32/variants/esp32",
+        "/Users/nuuttinyyssonen/.platformio/packages/framework-arduinoespressif32/libraries",
+        "/Users/nuuttinyyssonen/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include",
+        "/Users/nuuttinyyssonen/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/freertos/include",
+        "/Users/nuuttinyyssonen/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/newlib/platform_include"
+      ],
+      "browse": {
+        "path": [
+          "${workspaceFolder}/firmware/include",
+          "${workspaceFolder}/firmware/src",
+          "${workspaceFolder}/firmware/.pio/libdeps/esp32dev/Adafruit MPU6050",
+          "${workspaceFolder}/firmware/.pio/libdeps/esp32dev/Adafruit Unified Sensor",
+          "${workspaceFolder}/firmware/.pio/libdeps/esp32dev/Adafruit BusIO",
+          "/Users/nuuttinyyssonen/.platformio/packages/framework-arduinoespressif32/cores/esp32",
+          "/Users/nuuttinyyssonen/.platformio/packages/framework-arduinoespressif32/variants/esp32",
+          "/Users/nuuttinyyssonen/.platformio/packages/framework-arduinoespressif32/libraries"
+        ]
+      },
+      "compilerPath": "/usr/bin/clang",
+      "cStandard": "c17",
+      "cppStandard": "c++17",
+      "intelliSenseMode": "clang-x64"
+    }
+  ],
+  "version": 4
+}

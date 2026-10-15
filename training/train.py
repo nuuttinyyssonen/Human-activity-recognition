@@ -4,7 +4,7 @@ from load_data import build_dataframe
 from windowing import create_windows
 from features import extract_features
 from export_model import export_tree_to_cpp
-from test_cases import write_test_cases 
+from test_cases import write_test_cases, write_replay
 
 from sklearn.model_selection import GroupShuffleSplit, GroupKFold, cross_validate
 from sklearn.tree import DecisionTreeClassifier
@@ -81,9 +81,13 @@ if __name__ == "__main__":
 
     clf = final_evaluation(F_train, y_train, F_test, y_test, best_depth)
 
+    test_subjects = np.unique(subjects[test_idx])
+    write_replay(clf, df, test_subjects, "../firmware/replay.h",
+                 seg_len=150, per_class=1)
+
     write_test_cases(clf, X_test, y_test, F_test, "../firmware/test_cases.h")
 
     # Export tree
-    # clf = final_evaluation(F_train, y_train, F_test, y_test, best_depth)
-    # with open("../firmware/tree.h", "w") as fh:
-    #    fh.write("#pragma once\n" + export_tree_to_cpp(clf))
+    clf = final_evaluation(F_train, y_train, F_test, y_test, best_depth)
+    with open("../firmware/tree.h", "w") as fh:
+        fh.write("#pragma once\n" + export_tree_to_cpp(clf))
