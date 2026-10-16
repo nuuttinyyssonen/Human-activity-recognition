@@ -1,6 +1,14 @@
 # Human Activity Recognition
 
 # Running the project
+1. First the dataset is needed from https://www.kaggle.com/datasets/malekzadeh/motionsense-dataset or you can use the download_data.py
+2. Put the dataset in project root in folder called data.
+3. packages that needs to be installed pandas, numpy, scikit-learn
+4. You can try to run load_data.py to see that the data works.
+5. Run train.py from /training
+6. Make sure /firmware/include contains replay.h, test_cases.h and tree.h
+
+One thing to note!:
 main.cpp might give error for "#include errors detected. Please update your includePath. Syntax errors for this file will not be reported until included files are found.". To work around this: Select PlatformIO from VScode and "Pick a folder". Select the firmware folder and it opens only firmware folder in vs code. This allows you to build from platfomio.ini and compile from diagram.json
 
 ## Firmware
